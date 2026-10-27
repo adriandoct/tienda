@@ -1,0 +1,7 @@
+asgiref==3.12.1
+django==6.1.1
+django-mongodb-backend==6.1.0
+dnspython==2.8.0
+pymongo==4.18.2
+sqlparse==0.6.0
+tzdata==2026.4

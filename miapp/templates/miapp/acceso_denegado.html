@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Restringido | Control de Privilegios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #090d16;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        .card {
+            background: rgba(19, 29, 51, 0.9);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 480px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .icon { font-size: 3.5rem; margin-bottom: 1rem; }
+        h1 { font-size: 1.6rem; color: #f43f5e; margin-bottom: 0.75rem; }
+        p { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.75rem; }
+        .btn {
+            display: inline-block;
+            background: #06b6d4;
+            color: #04121e;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">🚫</div>
+        <h1>Acceso Denegado por Privilegios</h1>
+        <p>{{ motivo }}</p>
+        <p>Por políticas de seguridad, este módulo requiere privilegios autorizados. Si eres operador de caja, ingresa con tu cuenta de Cajero.</p>
+        <a href="{% url 'login' %}" class="btn">Iniciar Sesión con otra Cuenta &rarr;</a>
+    </div>
+</body>
+</html>

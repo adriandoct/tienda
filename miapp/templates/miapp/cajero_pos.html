@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto de Venta | Módulo de Cajero (Semiconductores)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #090d16;
+            --bg-surface: #0f172a;
+            --bg-card: rgba(19, 29, 51, 0.85);
+            --border-subtle: rgba(56, 189, 248, 0.18);
+            --border-glow: rgba(56, 189, 248, 0.4);
+            
+            --text-title: #f8fafc;
+            --text-body: #cbd5e1;
+            --text-muted: #94a3b8;
+            
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-purple: #a855f7;
+            --accent-rose: #f43f5e;
+            
+            --grad-accent: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            --grad-primary: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .topbar {
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-pos {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .pos-badge {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 6px;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .brand-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-title);
+        }
+
+        .user-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .operator-info {
+            text-align: right;
+            font-size: 0.85rem;
+        }
+
+        .operator-name {
+            font-weight: 700;
+            color: var(--text-title);
+        }
+
+        .role-pill {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 9999px;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .btn-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .btn-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-cyan);
+        }
+
+        /* Security Alert Banner */
+        .security-banner {
+            background: rgba(245, 158, 11, 0.1);
+            border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+            padding: 0.5rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: #fde68a;
+        }
+
+        .security-banner strong {
+            color: #fbbf24;
+        }
+
+        /* Main POS Grid */
+        .pos-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 440px;
+            height: calc(100vh - 105px);
+            overflow: hidden;
+        }
+
+        @media (max-width: 1024px) {
+            .pos-container {
+                grid-template-columns: 1fr;
+                height: auto;
+                overflow: visible;
+            }
+        }
+
+        /* Catalog Column (Left) */
+        .catalog-panel {
+            padding: 1.5rem;
+            overflow-y: auto;
+            border-right: 1px solid var(--border-subtle);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 240px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 0.7rem 1rem;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.15rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .product-card:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .prod-sku {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.78rem;
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 0.35rem;
+        }
+
+        .prod-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-title);
+            margin-bottom: 0.5rem;
+            line-height: 1.35;
+        }
+
+        .prod-specs {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .prod-price-stock {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.85rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .prod-price {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent-emerald);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .prod-stock {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .stock-available { color: var(--accent-emerald); }
+        .stock-low { color: var(--accent-amber); }
+        .stock-empty { color: var(--accent-rose); }
+
+        .btn-add {
+            width: 100%;
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            padding: 0.55rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .btn-add:hover {
+            background: var(--accent-cyan);
+            color: #04121e;
+        }
+
+        .btn-add:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            border-color: transparent;
+        }
+
+        /* Cart Column (Right) */
+        .cart-panel {
+            background: var(--bg-surface);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .cart-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-title);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-clear {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .btn-clear:hover { color: var(--accent-rose); }
+
+        /* Cart Items List */
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .empty-cart-msg {
+            text-align: center;
+            color: var(--text-muted);
+            margin: auto;
+            font-size: 0.9rem;
+        }
+
+        .cart-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .cart-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .cart-item-sku {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+        }
+
+        .cart-item-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-title);
+        }
+
+        .cart-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.25rem;
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        .qty-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .qty-btn:hover { background: rgba(255, 255, 255, 0.1); }
+
+        .qty-input {
+            width: 36px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 0.85rem;
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+        }
+
+        .item-subtotal {
+            text-align: right;
+            font-family: 'Fira Code', monospace;
+            font-weight: 700;
+            color: var(--accent-emerald);
+            font-size: 0.95rem;
+        }
+
+        .tier-badge {
+            font-size: 0.68rem;
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.15);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* Cart Summary & Checkout Footer */
+        .cart-footer {
+            padding: 1.25rem;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(15, 23, 42, 0.98);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            margin-bottom: 0.4rem;
+            color: var(--text-muted);
+        }
+
+        .summary-row.total-row {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #fff;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .total-amount {
+            color: var(--accent-emerald);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .form-select {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 0.5rem;
+            color: #fff;
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .pay-btn {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-body);
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .pay-btn.active {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--accent-emerald);
+            color: var(--accent-emerald);
+        }
+
+        .btn-checkout {
+            width: 100%;
+            background: var(--grad-accent);
+            color: #04121e;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .btn-checkout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-checkout:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Modal Ticket */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .ticket-card {
+            background: #fff;
+            color: #0f172a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            font-family: 'Fira Code', monospace;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .ticket-header {
+            text-align: center;
+            border-bottom: 2px dashed #94a3b8;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ticket-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .ticket-items {
+            width: 100%;
+            font-size: 0.8rem;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        .ticket-items th {
+            text-align: left;
+            border-bottom: 1px solid #cbd5e1;
+            padding: 0.4rem 0;
+        }
+
+        .ticket-items td {
+            padding: 0.35rem 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .ticket-total {
+            border-top: 2px dashed #94a3b8;
+            padding-top: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        .ticket-actions {
+            display: flex;
+            gap: 0.75rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-ticket-print {
+            flex: 1;
+            background: #0f172a;
+            color: #fff;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-ticket-new {
+            flex: 1;
+            background: #10b981;
+            color: #04121e;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <header class="topbar">
+        <div class="brand-pos">
+            <span class="pos-badge">Punto de Venta (POS)</span>
+            <span class="brand-title">Caja &bull; Semiconductores & Mecatrónica</span>
+        </div>
+        <div class="user-nav">
+            <div class="operator-info">
+                <span class="operator-name">{{ usuario_cajero.get_full_name|default:usuario_cajero.username }}</span>
+                <span class="role-pill">💼 Rol: {{ rol|upper }}</span>
+            </div>
+            <a href="{% url 'index' %}" class="btn-link">📊 Dashboard</a>
+            <a href="{% url 'logout' %}" class="btn-link" style="color: var(--accent-rose);">Cerrar Sesión</a>
+        </div>
+    </header>
+
+    <!-- Security Privileges Banner -->
+    <div class="security-banner">
+        <div>
+            🔒 <strong>Directiva de Seguridad RBAC:</strong> Sesión iniciada con privilegios de <strong>Cajero</strong>. Módulo de ventas, cálculo de subtotal y cobro habilitados. 
+            <span style="color: #fca5a5;">Privilegios de gestión de Inventario DENEGADOS (No autorizado para modificar existencias de almacén).</span>
+        </div>
+        <div>
+            Colección: <code>orders (Detalle Embebido Snapshot)</code>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="pos-container">
+        <!-- Catalog (Left) -->
+        <section class="catalog-panel">
+            <div class="filter-bar">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar por SKU o nombre (ej: STM32, DRV8825, MPU-6050)..." oninput="filterCatalog()">
+            </div>
+
+            <div class="products-grid" id="productsGrid">
+                {% for prod in productos %}
+                    <div class="product-card" data-sku="{{ prod.sku|lower }}" data-name="{{ prod.nombre|lower }}">
+                        <div>
+                            <span class="prod-sku">{{ prod.sku }}</span>
+                            <h3 class="prod-title">{{ prod.nombre }}</h3>
+                            <div class="prod-specs">
+                                <div>Encapsulado: <strong>{{ prod.encapsulado|default:"N/A" }}</strong></div>
+                                <div>Voltaje: {{ prod.voltaje|default:"3.3V / 5V" }}</div>
+                                <div>Ubicación: <code>{{ prod.ubicacion }}</code></div>
+                            </div>
+
+                            {% if prod.tiers %}
+                                <div style="margin-bottom: 0.6rem; font-size: 0.72rem; color: var(--accent-cyan);">
+                                    ⚡ Tiers:
+                                    {% for t in prod.tiers %}
+                                        <span>&ge;{{ t.min_qty }}: ${{ t.price }} </span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <div class="prod-price-stock">
+                                <span class="prod-price">${{ prod.precio_base }}</span>
+                                <span class="prod-stock {% if prod.stock > 15 %}stock-available{% elif prod.stock > 0 %}stock-low{% else %}stock-empty{% endif %}">
+                                    {% if prod.stock > 0 %}
+                                        {{ prod.stock }} disp.
+                                    {% else %}
+                                        Agotado
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <button class="btn-add" onclick="addToCart('{{ prod.id }}')" {% if prod.stock <= 0 %}disabled{% endif %}>
+                                <span>+ Agregar al Carrito</span>
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Cart (Right) -->
+        <section class="cart-panel">
+            <div class="cart-header">
+                <div class="cart-title">
+                    <span>🛒 Carrito de Venta</span>
+                    <span class="role-pill" id="cartCountBadge">0 ítems</span>
+                </div>
+                <button class="btn-clear" onclick="clearCart()">Vaciar Carrito</button>
+            </div>
+
+            <!-- Items list -->
+            <div class="cart-items" id="cartItemsList">
+                <div class="empty-cart-msg">
+                    <p style="font-size: 2.5rem; margin-bottom: 0.5rem;">🛍️</p>
+                    El carrito de venta está vacío.<br>Selecciona componentes del catálogo.
+                </div>
+            </div>
+
+            <!-- Checkout Box -->
+            <div class="cart-footer">
+                <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Cliente:</label>
+                <select id="clienteSelect" class="form-select">
+                    <option value="">Cliente de Mostrador (Público General)</option>
+                    {% for c in clientes %}
+                        <option value="{{ c.id }}">{{ c.nombre_completo }} (@{{ c.username }}) - {{ c.get_rol_display }}</option>
+                    {% endfor %}
+                </select>
+
+                <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Forma de Pago:</label>
+                <div class="payment-methods">
+                    <button type="button" class="pay-btn active" data-method="tarjeta" onclick="setPaymentMethod('tarjeta')">💳 Tarjeta / Terminal</button>
+                    <button type="button" class="pay-btn" data-method="efectivo" onclick="setPaymentMethod('efectivo')">💵 Efectivo</button>
+                    <button type="button" class="pay-btn" data-method="transferencia" onclick="setPaymentMethod('transferencia')">🏦 SPEI Bancario</button>
+                    <button type="button" class="pay-btn" data-method="stripe" onclick="setPaymentMethod('stripe')">⚡ Stripe Online</button>
+                </div>
+
+                <div class="summary-row">
+                    <span>Subtotal Productos:</span>
+                    <span id="subtotalDisplay" style="font-family: 'Fira Code', monospace;">$0.00 MXN</span>
+                </div>
+                <div class="summary-row">
+                    <span>Descuento por Volumen:</span>
+                    <span id="discountDisplay" style="font-family: 'Fira Code', monospace; color: var(--accent-cyan);">$0.00 MXN</span>
+                </div>
+                <div class="summary-row total-row">
+                    <span>Total a Cobrar:</span>
+                    <span class="total-amount" id="totalDisplay">$0.00 MXN</span>
+                </div>
+
+                <button class="btn-checkout" id="btnCheckout" onclick="processCheckout()" disabled>
+                    <span>💰 Cobrar y Generar Venta</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Ticket / Recibo Fiscal -->
+    <div class="modal-overlay" id="ticketModal">
+        <div class="ticket-card">
+            <div class="ticket-header">
+                <div class="ticket-title">SEMICONDUCTORES & MECATRÓNICA</div>
+                <div style="font-size: 0.75rem; color: #64748b;">COMPROBANTE DE VENTA CONSOLIDADA</div>
+                <div style="font-size: 0.75rem; margin-top: 0.25rem;">Folio: <strong id="ticketFolio">-</strong></div>
+                <div style="font-size: 0.72rem; color: #64748b;" id="ticketFecha">-</div>
+            </div>
+
+            <div style="font-size: 0.75rem; margin-bottom: 0.75rem;">
+                <div><strong>Cajero:</strong> <span id="ticketCajero">-</span></div>
+                <div><strong>Cliente:</strong> <span id="ticketCliente">-</span></div>
+                <div><strong>Pago:</strong> <span id="ticketMetodo">-</span></div>
+            </div>
+
+            <table class="ticket-items">
+                <thead>
+                    <tr>
+                        <th>Cant / SKU</th>
+                        <th style="text-align: right;">Unitario</th>
+                        <th style="text-align: right;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody id="ticketItemsBody"></tbody>
+            </table>
+
+            <div class="ticket-total">
+                <span>TOTAL:</span>
+                <span id="ticketTotalAmount">$0.00 MXN</span>
+            </div>
+
+            <div style="font-size: 0.68rem; color: #64748b; text-align: center; margin-bottom: 1.25rem;">
+                Documento respaldado en MongoDB colección <code>orders</code> con instantánea inmutable de productos.
+            </div>
+
+            <div class="ticket-actions">
+                <button class="btn-ticket-print" onclick="window.print()">🖨️ Imprimir</button>
+                <button class="btn-ticket-new" onclick="closeTicketModal()">+ Nueva Venta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Data from Django -->
+    <script>
+        const rawProducts = {{ productos_json|safe }};
+        const productsMap = {};
+        rawProducts.forEach(p => { productsMap[p.id] = p; });
+
+        let cart = [];
+        let selectedPaymentMethod = 'tarjeta';
+
+        function addToCart(productId) {
+            const product = productsMap[productId];
+            if (!product) return;
+
+            const existing = cart.find(item => item.id === productId);
+            if (existing) {
+                if (existing.cantidad < product.stock) {
+                    existing.cantidad++;
+                } else {
+                    alert(`Stock máximo disponible alcanzado (${product.stock} uds) para ${product.sku}`);
+                }
+            } else {
+                if (product.stock > 0) {
+                    cart.push({
+                        id: product.id,
+                        sku: product.sku,
+                        nombre: product.nombre,
+                        encapsulado: product.encapsulado,
+                        precio_base: product.precio_base,
+                        tiers: product.tiers,
+                        stock: product.stock,
+                        cantidad: 1
+                    });
+                } else {
+                    alert('Producto sin existencias en almacén.');
+                }
+            }
+            renderCart();
+        }
+
+        function updateQty(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+
+            const product = productsMap[productId];
+            const newQty = item.cantidad + delta;
+
+            if (newQty <= 0) {
+                cart = cart.filter(i => i.id !== productId);
+            } else if (newQty > product.stock) {
+                alert(`Stock máximo alcanzado (${product.stock} uds)`);
+            } else {
+                item.cantidad = newQty;
+            }
+            renderCart();
+        }
+
+        function removeItem(productId) {
+            cart = cart.filter(i => i.id !== productId);
+            renderCart();
+        }
+
+        function clearCart() {
+            cart = [];
+            renderCart();
+        }
+
+        function calculateItemPrice(item) {
+            let unitPrice = item.precio_base;
+            let tierApplied = false;
+
+            if (item.tiers && item.tiers.length > 0) {
+                for (let i = item.tiers.length - 1; i >= 0; i--) {
+                    if (item.cantidad >= item.tiers[i].min_qty) {
+                        unitPrice = item.tiers[i].price;
+                        tierApplied = true;
+                        break;
+                    }
+                }
+            }
+            return { unitPrice, tierApplied };
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cartItemsList');
+            const countBadge = document.getElementById('cartCountBadge');
+            const subtotalDisplay = document.getElementById('subtotalDisplay');
+            const discountDisplay = document.getElementById('discountDisplay');
+            const totalDisplay = document.getElementById('totalDisplay');
+            const btnCheckout = document.getElementById('btnCheckout');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart-msg">
+                        <p style="font-size: 2.5rem; margin-bottom: 0.5rem;">🛍️</p>
+                        El carrito de venta está vacío.<br>Selecciona componentes del catálogo.
+                    </div>`;
+                countBadge.textContent = '0 ítems';
+                subtotalDisplay.textContent = '$0.00 MXN';
+                discountDisplay.textContent = '$0.00 MXN';
+                totalDisplay.textContent = '$0.00 MXN';
+                btnCheckout.disabled = true;
+                return;
+            }
+
+            let totalItems = 0;
+            let subtotalNormal = 0;
+            let totalFinal = 0;
+
+            container.innerHTML = '';
+
+            cart.forEach(item => {
+                totalItems += item.cantidad;
+                const { unitPrice, tierApplied } = calculateItemPrice(item);
+                const itemSubtotal = unitPrice * item.cantidad;
+                subtotalNormal += (item.precio_base * item.cantidad);
+                totalFinal += itemSubtotal;
+
+                const itemEl = document.createElement('div');
+                itemEl.className = 'cart-item';
+                itemEl.innerHTML = `
+                    <div class="cart-item-header">
+                        <div>
+                            <span class="cart-item-sku">${item.sku}</span>
+                            <div class="cart-item-name">${item.nombre}</div>
+                            ${tierApplied ? '<span class="tier-badge">✨ Descuento x Volumen Aplicado</span>' : ''}
+                        </div>
+                        <button onclick="removeItem('${item.id}')" style="background:transparent; border:none; color: #ef4444; cursor:pointer; font-size: 0.9rem;">✕</button>
+                    </div>
+                    <div class="cart-item-footer">
+                        <div class="qty-control">
+                            <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
+                            <input type="text" class="qty-input" value="${item.cantidad}" readonly>
+                            <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                        </div>
+                        <div class="item-subtotal">
+                            $${itemSubtotal.toFixed(2)}
+                            <div style="font-size: 0.7rem; color: #94a3b8;">$${unitPrice.toFixed(2)} c/u</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(itemEl);
+            });
+
+            const totalDiscount = subtotalNormal - totalFinal;
+
+            countBadge.textContent = `${totalItems} ítem${totalItems > 1 ? 's' : ''}`;
+            subtotalDisplay.textContent = `$${subtotalNormal.toFixed(2)} MXN`;
+            discountDisplay.textContent = `-$${totalDiscount.toFixed(2)} MXN`;
+            totalDisplay.textContent = `$${totalFinal.toFixed(2)} MXN`;
+            btnCheckout.disabled = false;
+        }
+
+        function setPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('.pay-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.method === method);
+            });
+        }
+
+        function filterCatalog() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            document.querySelectorAll('.product-card').forEach(card => {
+                const sku = card.dataset.sku;
+                const name = card.dataset.name;
+                const matches = sku.includes(query) || name.includes(query);
+                card.style.display = matches ? 'flex' : 'none';
+            });
+        }
+
+        // Process Checkout to Django backend
+        async function processCheckout() {
+            if (cart.length === 0) return;
+
+            const btnCheckout = document.getElementById('btnCheckout');
+            btnCheckout.disabled = true;
+            btnCheckout.textContent = '⏳ Procesando venta y descontando inventario...';
+
+            const itemsPayload = cart.map(item => {
+                const { unitPrice } = calculateItemPrice(item);
+                return {
+                    id: item.id,
+                    cantidad: item.cantidad,
+                    precio_unitario: unitPrice
+                };
+            });
+
+            const clienteId = document.getElementById('clienteSelect').value;
+
+            try {
+                const response = await fetch("{% url 'procesar_venta_cajero' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        items: itemsPayload,
+                        cliente_id: clienteId || null,
+                        metodo_pago: selectedPaymentMethod,
+                        notas: 'Venta procesada desde Módulo de Caja'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showTicketModal(data.ticket);
+                    // Update local stock in memory
+                    cart.forEach(item => {
+                        if (productsMap[item.id]) {
+                            productsMap[item.id].stock -= item.cantidad;
+                        }
+                    });
+                    clearCart();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Ocurrió un error al conectar con el servidor: ' + err);
+            } finally {
+                btnCheckout.disabled = false;
+                btnCheckout.innerHTML = '<span>💰 Cobrar y Generar Venta</span>';
+            }
+        }
+
+        function showTicketModal(ticket) {
+            document.getElementById('ticketFolio').textContent = ticket.folio;
+            document.getElementById('ticketFecha').textContent = ticket.fecha;
+            document.getElementById('ticketCajero').textContent = ticket.cajero;
+            document.getElementById('ticketCliente').textContent = ticket.cliente;
+            document.getElementById('ticketMetodo').textContent = ticket.metodo_pago;
+            document.getElementById('ticketTotalAmount').textContent = `$${ticket.total.toFixed(2)} MXN`;
+
+            const tbody = document.getElementById('ticketItemsBody');
+            tbody.innerHTML = '';
+            ticket.items.forEach(it => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div><strong>${it.cantidad}x</strong> ${it.sku}</div>
+                        <div style="font-size: 0.7rem; color: #64748b;">${it.nombre}</div>
+                    </td>
+                    <td style="text-align: right;">$${it.precio_unitario.toFixed(2)}</td>
+                    <td style="text-align: right; font-weight: 700;">$${it.subtotal.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('ticketModal').style.display = 'flex';
+        }
+
+        function closeTicketModal() {
+            document.getElementById('ticketModal').style.display = 'none';
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
