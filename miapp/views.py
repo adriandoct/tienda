@@ -162,7 +162,8 @@ def modulo_cajero(request):
             'pines': p.pines or '',
             'stock': stock_disp,
             'ubicacion': inv.ubicacion_anaquel if inv else 'Sin asignar',
-            'tiers': tiers
+            'tiers': tiers,
+            'imagen_url': p.get_imagen_url,
         })
 
     # Clientes disponibles para la venta

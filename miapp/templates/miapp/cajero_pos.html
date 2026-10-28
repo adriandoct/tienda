@@ -206,8 +206,53 @@
 
         .product-card:hover {
             border-color: var(--border-glow);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 16px rgba(6, 182, 212, 0.15);
+        }
+
+        .prod-image-wrap {
+            position: relative;
+            width: 100%;
+            height: 145px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 0.85rem;
+            background: #090e1a;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .prod-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+            display: block;
+        }
+
+        .product-card:hover .prod-image {
+            transform: scale(1.08);
+        }
+
+        .prod-img-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.05) 60%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .prod-img-badge {
+            position: absolute;
+            top: 7px;
+            left: 7px;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: var(--accent-cyan);
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            z-index: 2;
         }
 
         .prod-sku {
@@ -667,6 +712,11 @@
                 {% for prod in productos %}
                     <div class="product-card" data-sku="{{ prod.sku|lower }}" data-name="{{ prod.nombre|lower }}">
                         <div>
+                            <div class="prod-image-wrap">
+                                <span class="prod-img-badge">{{ prod.sku }}</span>
+                                <img src="{{ prod.imagen_url }}" alt="{{ prod.nombre }}" class="prod-image" loading="lazy">
+                                <div class="prod-img-overlay"></div>
+                            </div>
                             <span class="prod-sku">{{ prod.sku }}</span>
                             <h3 class="prod-title">{{ prod.nombre }}</h3>
                             <div class="prod-specs">
@@ -834,6 +884,7 @@
                         precio_base: product.precio_base,
                         tiers: product.tiers,
                         stock: product.stock,
+                        imagen_url: product.imagen_url,
                         cantidad: 1
                     });
                 } else {
@@ -924,13 +975,14 @@
                 const itemEl = document.createElement('div');
                 itemEl.className = 'cart-item';
                 itemEl.innerHTML = `
-                    <div class="cart-item-header">
-                        <div>
+                    <div class="cart-item-header" style="display: flex; gap: 0.75rem; align-items: center;">
+                        <img src="${item.imagen_url || '/static/miapp/img/products/stm32f401.jpg'}" alt="${item.sku}" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(56, 189, 248, 0.35); flex-shrink: 0;">
+                        <div style="flex: 1; min-width: 0;">
                             <span class="cart-item-sku">${item.sku}</span>
                             <div class="cart-item-name">${item.nombre}</div>
                             ${tierApplied ? '<span class="tier-badge">✨ Descuento x Volumen Aplicado</span>' : ''}
                         </div>
-                        <button onclick="removeItem('${item.id}')" style="background:transparent; border:none; color: #ef4444; cursor:pointer; font-size: 0.9rem;">✕</button>
+                        <button onclick="removeItem('${item.id}')" style="background:transparent; border:none; color: #ef4444; cursor:pointer; font-size: 1.1rem; padding: 0.2rem;">✕</button>
                     </div>
                     <div class="cart-item-footer">
                         <div class="qty-control">

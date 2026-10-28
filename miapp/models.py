@@ -197,6 +197,8 @@ class Producto(models.Model):
     precio_base = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Precio Base Unitario (1 ud)")
     descripcion = models.TextField(blank=True, verbose_name="Descripción Técnica")
 
+    imagen_url = models.CharField(max_length=255, blank=True, default='', verbose_name="URL de Imagen del Producto")
+
     # Especificaciones técnicas flexibles
     datasheet_url = models.URLField(blank=True, verbose_name="URL del Datasheet Oficial")
     encapsulado = models.CharField(max_length=100, blank=True, verbose_name="Encapsulado / Package (ej. LQFP-64, SOIC-8, TO-220)")
@@ -224,6 +226,23 @@ class Producto(models.Model):
         db_table = 'products'
         verbose_name = "Producto (Semiconductores y Mecatrónica)"
         verbose_name_plural = "products (Semiconductores y Mecatrónica)"
+
+    @property
+    def get_imagen_url(self):
+        """Retorna la URL de la imagen del producto, con fallback automático inteligente según SKU."""
+        if self.imagen_url:
+            return self.imagen_url
+        sku_map = {
+            'STM32F401RET6': '/static/miapp/img/products/stm32f401.jpg',
+            'ESP32-WROOM-32D': '/static/miapp/img/products/esp32.jpg',
+            'ATMEGA328P-PU': '/static/miapp/img/products/atmega328p.jpg',
+            'DRV8825': '/static/miapp/img/products/drv8825.jpg',
+            'L298N-MOD': '/static/miapp/img/products/l298n.jpg',
+            'MPU-6050': '/static/miapp/img/products/mpu6050.jpg',
+            'INA219': '/static/miapp/img/products/ina219.jpg',
+            'NEMA17-17HS4401': '/static/miapp/img/products/nema17.jpg',
+        }
+        return sku_map.get(self.sku, '/static/miapp/img/products/stm32f401.jpg')
 
     def __str__(self):
         return f"{self.sku} - {self.nombre}"
