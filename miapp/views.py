@@ -80,9 +80,14 @@ def index(request):
 
 def login_view(request):
     """
-    Pantalla de inicio de sesión con soporte para roles (Administrador y Cajero).
+    Pantalla de inicio de sesión con soporte para roles y redirección post-login.
     """
+    next_url = request.GET.get('next') or request.POST.get('next') or ''
+    show_admin_roles = bool(request.GET.get('admin') == '1' or (request.user.is_authenticated and request.user.is_superuser))
+
     if request.user.is_authenticated:
+        if next_url:
+            return redirect(next_url)
         rol = get_user_role(request.user)
         if rol == 'cajero':
             return redirect('modulo_cajero')
@@ -96,6 +101,8 @@ def login_view(request):
         if user is not None:
             login(request, user)
             rol = get_user_role(user)
+            if next_url:
+                return redirect(next_url)
             if rol == 'cajero':
                 return redirect('modulo_cajero')
             return redirect('index')
@@ -104,6 +111,8 @@ def login_view(request):
 
     return render(request, 'miapp/login.html', {
         'error_msg': error_msg,
+        'next': next_url,
+        'show_admin_roles': show_admin_roles,
     })
 
 
@@ -116,17 +125,10 @@ def logout_view(request):
 @login_required(login_url='login')
 def modulo_cajero(request):
     """
-    Módulo de Punto de Venta (POS) y Carrito de Compras exclusivo para el rol de CAJERO
-    (o Administrador).
-    Control de privilegios: El cajero solo puede vender, cobrar y registrar el detalle,
-    sin privilegios para alterar el inventario ni modificar productos.
+    Módulo de Carrito de Compras / Punto de Venta (POS).
+    Permite comprar a usuarios autenticados (clientes, cajeros, administradores).
     """
     rol = get_user_role(request.user)
-    if rol not in ['cajero', 'admin']:
-        # Acceso denegado si no es cajero
-        return render(request, 'miapp/acceso_denegado.html', {
-            'motivo': 'Este módulo es exclusivo para usuarios con el rol de Cajero / Operador de Ventas.'
-        }, status=403)
 
     # Obtener catálogo de productos con sus existencias de inventario
     productos = Producto.objects.filter(activo=True).select_related('categoria', 'proveedor')
@@ -194,8 +196,6 @@ def procesar_venta_cajero(request):
     - Retorna el detalle para el ticket de venta.
     """
     rol = get_user_role(request.user)
-    if rol not in ['cajero', 'admin']:
-        return JsonResponse({'success': False, 'error': 'No tienes permisos de Cajero para procesar ventas.'}, status=403)
 
     try:
         data = json.loads(request.body)

@@ -521,11 +521,13 @@
 
             <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                 <a href="{% url 'modulo_cajero' %}" class="btn" style="background: var(--grad-accent); color: #04121e; padding: 0.5rem 1.1rem; font-size: 0.85rem; font-weight: 700; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
-                    <span>🛒 Abrir Módulo de Cajero (POS)</span>
+                    <span>🛒 Carrito de Compras</span>
                 </a>
+                {% if user_role == 'admin' %}
                 <a href="/admin/" target="_blank" class="btn" style="background: rgba(30, 41, 59, 0.8); color: var(--text-title); border: 1px solid var(--border-subtle); padding: 0.5rem 1rem; font-size: 0.85rem;">
                     <span>⚡ Django Admin</span>
                 </a>
+                {% endif %}
                 {% if request.user.is_authenticated %}
                     <a href="{% url 'logout' %}" style="color: var(--accent-rose); font-size: 0.85rem; text-decoration: none; padding: 0.4rem 0.6rem;">Cerrar Sesión</a>
                 {% else %}
@@ -539,15 +541,17 @@
             <h1 class="main-title">Systec by Silva Laptop, Mecatrónica</h1>
             <div class="cta-bar">
                 <a href="{% url 'modulo_cajero' %}" class="btn btn-primary" id="btn-pos">
-                    <span>🛒 Ir al Carrito de Ventas (Cajero POS)</span>
+                    <span>🛒 Ir al Carrito / Comprar</span>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
                 </a>
+                <a href="#tab-products" onclick="switchTab('products')" class="btn btn-secondary">
+                    <span>📦 Ver Catálogo</span>
+                </a>
+                {% if user_role == 'admin' %}
                 <a href="/admin/" class="btn btn-secondary" target="_blank" id="btn-admin">
                     <span>⚡ Django Admin</span>
                 </a>
-                <a href="#tab-products" onclick="switchTab('products')" class="btn btn-secondary">
-                    <span>📦 Catálogo de Productos</span>
-                </a>
+                {% endif %}
             </div>
         </header>
 
@@ -676,14 +680,17 @@
                             {% endif %}
                         </div>
 
-                        {% if prod.datasheet_url %}
-                            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06);">
-                                <a href="{{ prod.datasheet_url }}" target="_blank" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; width: 100%; justify-content: center;">
+                        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: 0.5rem;">
+                            <a href="{% url 'modulo_cajero' %}?add={{ prod.sku }}" class="btn btn-primary" style="padding: 0.6rem 1rem; font-size: 0.88rem; width: 100%; justify-content: center; font-weight: 700; text-decoration: none;">
+                                <span>🛒 Comprar</span>
+                            </a>
+                            {% if prod.datasheet_url %}
+                                <a href="{{ prod.datasheet_url }}" target="_blank" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; width: 100%; justify-content: center; text-decoration: none;">
                                     <span>📄 Ver Datasheet Oficial</span>
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                 </a>
-                            </div>
-                        {% endif %}
+                            {% endif %}
+                        </div>
                     </div>
                 {% empty %}
                     <p style="color: var(--text-muted);">No hay productos registrados aún.</p>

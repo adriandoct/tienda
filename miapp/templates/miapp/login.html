@@ -197,9 +197,9 @@
 <body>
     <div class="login-card">
         <div class="login-header">
-            <span class="badge-system">Control de Acceso RBAC</span>
+            <span class="badge-system">Systec by Silva</span>
             <h1>Iniciar Sesión</h1>
-            <p class="sub">Ingresa con cualquiera de los 5 roles del sistema</p>
+            <p class="sub">Ingresa para continuar con tu compra o gestionar el sistema</p>
         </div>
 
         {% if error_msg %}
@@ -210,19 +210,23 @@
 
         <form method="POST" action="{% url 'login' %}">
             {% csrf_token %}
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
             <div class="form-group">
                 <label for="username">Usuario:</label>
-                <input type="text" id="username" name="username" placeholder="admin, cajero, cmendoza, etc." required autofocus>
+                <input type="text" id="username" name="username" placeholder="Ingresa tu usuario" required autofocus>
             </div>
             <div class="form-group">
                 <label for="password">Contraseña:</label>
                 <input type="password" id="password" name="password" placeholder="••••••••" required>
             </div>
-            <button type="submit" class="btn-submit">Ingresar al Sistema &rarr;</button>
+            <button type="submit" class="btn-submit">Ingresar y Continuar &rarr;</button>
         </form>
 
+        {% if show_admin_roles %}
         <div class="quick-roles">
-            <div class="quick-title">⚡ Acceso Rápido por Rol (Haz Clic Para Rellenar)</div>
+            <div class="quick-title">⚡ Acceso Rápido por Rol (Administrador)</div>
             <div class="quick-btns">
                 <button type="button" class="btn-quick" onclick="setCredentials('admin', 'admin1234')">
                     👑 Admin<br><span style="font-size: 0.7rem; color: var(--accent-cyan);">admin1234 (Total)</span>
@@ -244,6 +248,11 @@
                 🔒 Haz clic en cualquiera de los botones para autocompletar usuario y contraseña.
             </p>
         </div>
+        {% else %}
+        <div style="text-align: center; margin-top: 1.5rem;">
+            <a href="?admin=1" style="color: rgba(255,255,255,0.25); font-size: 0.75rem; text-decoration: none;">⚙️ Acceso Administrador</a>
+        </div>
+        {% endif %}
     </div>
 
     <script>

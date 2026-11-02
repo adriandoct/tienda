@@ -1125,6 +1125,18 @@
             }
             return cookieValue;
         }
+
+        // Auto-agregar producto si viene el parámetro ?add=SKU
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const addSku = urlParams.get('add');
+            if (addSku) {
+                const target = productsData.find(p => p.sku.toLowerCase() === addSku.toLowerCase());
+                if (target) {
+                    addToCart(target.id);
+                }
+            }
+        });
     </script>
 </body>
 </html>
