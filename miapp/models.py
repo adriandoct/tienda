@@ -229,9 +229,16 @@ class Producto(models.Model):
 
     @property
     def get_imagen_url(self):
-        """Retorna la URL de la imagen del producto, con fallback automático inteligente según SKU."""
-        if self.imagen_url:
+        """Retorna la URL de la imagen del producto, con fallback automático inteligente según SKU o nombre."""
+        if self.imagen_url and (self.imagen_url.startswith('http://') or self.imagen_url.startswith('https://') or self.imagen_url.startswith('/static/')):
             return self.imagen_url
+
+        sku_upper = (self.sku or '').upper()
+        nombre_lower = (self.nombre or '').lower()
+
+        if sku_upper.startswith('LAP') or 'laptop' in nombre_lower or 'latitude' in nombre_lower:
+            return 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800'
+
         sku_map = {
             'STM32F401RET6': '/static/miapp/img/products/stm32f401.jpg',
             'ESP32-WROOM-32D': '/static/miapp/img/products/esp32.jpg',
