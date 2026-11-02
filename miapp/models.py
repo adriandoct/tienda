@@ -237,9 +237,10 @@ class Producto(models.Model):
         nombre_lower = (self.nombre or '').lower()
 
         if sku_upper.startswith('LAP') or 'laptop' in nombre_lower or 'latitude' in nombre_lower:
-            return 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800'
+            return '/static/miapp/img/products/dell_latitude_7420.jpg'
 
         sku_map = {
+            'LAP-12345': '/static/miapp/img/products/dell_latitude_7420.jpg',
             'STM32F401RET6': '/static/miapp/img/products/stm32f401.jpg',
             'ESP32-WROOM-32D': '/static/miapp/img/products/esp32.jpg',
             'ATMEGA328P-PU': '/static/miapp/img/products/atmega328p.jpg',
