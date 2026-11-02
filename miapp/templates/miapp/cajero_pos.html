@@ -714,7 +714,7 @@
                         <div>
                             <div class="prod-image-wrap">
                                 <span class="prod-img-badge">{{ prod.sku }}</span>
-                                <img src="{{ prod.imagen_url }}" alt="{{ prod.nombre }}" class="prod-image" loading="lazy">
+                                <img src="{{ prod.imagen_url }}" alt="{{ prod.nombre }}" class="prod-image" loading="lazy" onerror="this.onerror=null; this.src='/static/miapp/img/products/stm32f401.jpg';">
                                 <div class="prod-img-overlay"></div>
                             </div>
                             <span class="prod-sku">{{ prod.sku }}</span>

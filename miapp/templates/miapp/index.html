@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecosistema de Semiconductores & Mecatrónica | Django + MongoDB</title>
+    <title>Systec by Silva Laptop, Mecatrónica | Django + MongoDB</title>
     <!-- Google Fonts Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -540,10 +540,7 @@
                 <span class="pulse-dot"></span>
                 <span>MongoDB Oficial &bull; django-mongodb-backend</span>
             </div>
-            <h1 class="main-title">Ecosistema Semiconductores & Mecatrónica</h1>
-            <p class="main-subtitle">
-                Arquitectura desacoplada en MongoDB con <strong>7 Colecciones Principales y Anexas</strong>: Catálogo con especificaciones técnicas y precios escalonados, inventario segregado para alta concurrencia, órdenes con instantánea embebida y pasarelas de pago.
-            </p>
+            <h1 class="main-title">Systec by Silva Laptop, Mecatrónica</h1>
             <div class="cta-bar">
                 <a href="{% url 'modulo_cajero' %}" class="btn btn-primary" id="btn-pos">
                     <span>🛒 Ir al Carrito de Ventas (Cajero POS)</span>
@@ -624,7 +621,7 @@
                         <div>
                             <div class="item-card-image-wrap">
                                 <span class="item-image-tag">{{ prod.proveedor.codigo }} &bull; {{ prod.encapsulado|default:"IC" }}</span>
-                                <img src="{{ prod.get_imagen_url }}" alt="{{ prod.nombre }}" class="item-card-image" loading="lazy">
+                                <img src="{{ prod.get_imagen_url }}" alt="{{ prod.nombre }}" class="item-card-image" loading="lazy" onerror="this.onerror=null; this.src='/static/miapp/img/products/stm32f401.jpg';">
                                 <div class="item-image-overlay"></div>
                             </div>
                             <div class="item-card-header">
