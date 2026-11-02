@@ -236,6 +236,9 @@ class Producto(models.Model):
         sku_upper = (self.sku or '').upper()
         nombre_lower = (self.nombre or '').lower()
 
+        if 'thinkpad' in nombre_lower or 'lenovo' in nombre_lower:
+            return '/static/miapp/img/products/laptop_thinkpad.jpg'
+
         if sku_upper.startswith('LAP') or 'laptop' in nombre_lower or 'latitude' in nombre_lower:
             return '/static/miapp/img/products/dell_latitude_7420.jpg'
 
